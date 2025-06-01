@@ -109,3 +109,21 @@ La descomposición/factorización de [Cholesky](https://en.wikipedia.org/wiki/Ch
 De esta forma el producto: 
 $\ (X - \mu_k)^\top \Sigma_k^{-1} (X - \mu_k)  \in \mathbb{R}^{k \times n \times n}$ contiene la mencionada matriz de $n \times n$.
 
+5. Sea $A \in \mathbb{R}^{n \times m} $, $B \in \mathbb{R}^{m \times n} $. La componente i-th de la diagonal de $AB$ se puede escribir como $[AB]_{ii} = \sum_{k=1}^m A_{ik} B_{ki}$. Entonces el vector de la diagonal de $AB$ se define como: 
+    $$\operatorname{diag}(AB) = \left[
+    \sum_{k=1}^m A_{1k} B_{k1},\ 
+    \sum_{k=1}^m A_{2k} B_{k2},\ 
+    \dots,\ 
+    \sum_{k=1}^m A_{nk} B_{kn}
+    \right]$$
+    Por otro lado como $B^T\in\mathbb{R}^{n \times m}$ entonces $(A \odot B^T)_{ij} = A_{ij} B_{ji}$. Luego sumando las columnas por fila se tiene 
+    $$
+    \sum_{\text{cols}} A \odot B^{T}
+    = \left[
+    \sum_{k=1}^m A_{1k} B_{k1},\ 
+    \sum_{k=1}^m A_{2k} B_{k2},\ 
+    \dots,\ 
+    \sum_{k=1}^m A_{nk} B_{kn}
+    \right]$$
+
+
