@@ -103,3 +103,9 @@ La descomposición/factorización de [Cholesky](https://en.wikipedia.org/wiki/Ch
     ```
 
 ### 2) Optimización
+
+3. Ver en archivo QDA.py nueva clase FasterQDA que hereda de TensorizedQDA. 
+4. En este caso tendremos a $X \in \mathbb{R}^{p \times n}$ con 𝑛 observaciones columna, cada una con 𝑝 características.  $\mu_k \in \mathbb{R}^{k \times p \times 1}$ y $\Sigma_k^{-1} \in \mathbb{R}^{k \times p \times p}$, seguiran siendo calculados como en los puntos anteriores. Las medias centradas por clase ahora se tendra que calculara para n observaciones como: $X_{\text{centered}} = X - \mu_k \in \mathbb{R}^{k \times p \times n}$. 
+De esta forma el producto: 
+$\ (X - \mu_k)^\top \Sigma_k^{-1} (X - \mu_k)  \in \mathbb{R}^{k \times n \times n}$ contiene la mencionada matriz de $n \times n$.
+
