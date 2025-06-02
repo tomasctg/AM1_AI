@@ -81,3 +81,25 @@ class FasterQDA(TensorizedQDA):
         diag_inner_prod = np.diagonal(inner_prod, axis1=1, axis2=2)
 
         return 0.5*np.log(LA.det(self.tensor_inv_cov))[:, np.newaxis] - 0.5 * diag_inner_prod
+
+
+class EfficientQDA(TensorizedQDA):
+
+    def predict(self, X):
+
+        m_obs = X.shape[1]
+        y_hat = np.empty(m_obs, dtype=int)
+        y_hat = self._predict_one(X)
+
+        return y_hat.reshape(1, -1)
+
+    def _predict_one(self, x):
+        # return the class that has maximum a posteriori probability
+        return np.argmax(self.log_a_priori[:, np.newaxis] + self._predict_log_conditionals(x), axis=0)
+
+    def _predict_log_conditionals(self, x):
+        unbiased_x = x - self.tensor_means  # (k, p, n)
+        inv_cov_x = self.tensor_inv_cov @ unbiased_x  # (k, p, n)
+        diag_inner_prod = np.sum(inv_cov_x * unbiased_x, axis=1)  # (k, n)
+        
+        return 0.5 * np.log(np.linalg.det(self.tensor_inv_cov))[:, np.newaxis] - 0.5 * diag_inner_prod

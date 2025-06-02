@@ -1,7 +1,7 @@
 from numpy.random import RandomState
 from Benchmarking import Benchmark
 from Datasets import get_wine_dataset, label_encode, split_transpose
-from QDA import QDA, TensorizedQDA, FasterQDA
+from QDA import QDA, TensorizedQDA, FasterQDA, EfficientQDA
 from LDA import LDA
 
 X_full, y_full = get_wine_dataset()
@@ -37,14 +37,14 @@ b = Benchmark(
     same_splits=False
 )
 
-to_bench = [QDA, TensorizedQDA, LDA, FasterQDA]
+to_bench = [QDA, TensorizedQDA, LDA, FasterQDA, EfficientQDA]
 
 for model in to_bench:
     b.bench(model)
 
 summ = b.summary(baseline='QDA')
 print(summ[[
-    'train_median_ms', 'test_median_ms', 'mean_accuracy',
-    'train_speedup', 'test_speedup',
-    'train_mem_reduction', 'test_mem_reduction'
+    'test_median_ms', 'mean_accuracy',
+    'test_speedup',
+    'test_mem_reduction'
 ]])

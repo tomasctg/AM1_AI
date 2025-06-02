@@ -126,4 +126,17 @@ $\ (X - \mu_k)^\top \Sigma_k^{-1} (X - \mu_k)  \in \mathbb{R}^{k \times n \times
     \sum_{k=1}^m A_{nk} B_{kn}
     \right]$$
 
+6. Ver clase EfficientQDA en QDA.py especificamente en 
+    ```python 
+    diag_inner_prod = np.sum(inv_cov_x * unbiased_x, axis=1)  # (k, n)
+    ```
+7. Tomando como baseline el modelo QDA basico, vemos los siguientes resultados.
+
+    | Model         | Test Median (ms) | Mean Accuracy  | Test Speedup  | Test Mem Reduction  |
+    |---------------|------------------|----------------|---------------|---------------------|
+    | QDA           | 3.487574         | 0.982407       | 1.000000      | 1.000000            |
+    | TensorizedQDA | 1.374187         | 0.982593       | 2.537918      | 0.638765            |
+    | LDA           | 1.432470         | 0.716296       | 2.434659      | 1.742188            |
+    | FasterQDA     | 0.155948         | 0.983333       | 22.363701     | 0.069789            |
+    | EfficientQDA  | 0.110844         | 0.986111       | 31.463808     | 0.099771            |
 
