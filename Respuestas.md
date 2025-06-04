@@ -140,3 +140,19 @@ $\ (X - \mu_k)^\top \Sigma_k^{-1} (X - \mu_k)  \in \mathbb{R}^{k \times n \times
     | FasterQDA     | 0.155948         | 0.983333       | 22.363701     | 0.069789            |
     | EfficientQDA  | 0.110844         | 0.986111       | 31.463808     | 0.099771            |
 
+### 3) Cholesky
+8. Siendo $A=LL^T$, la inversa de $A$:
+    $$A^{-1} = L^{-T}L^{-1}$$
+    Retomando la ecuacion:
+    $$
+    \log{f_j(x)} = -\frac{1}{2}\log |\Sigma_j| - \frac{1}{2} (x-\mu_j)^T \Sigma_j^{-1} (x- \mu_j) + C
+    $$
+    Si $$\Sigma_j = L_{j}L_{j}^{T}$$
+    Luego $$\Sigma_j^{-1} = L_{j}^{-T}L_{j}^{-1}$$ 
+    Definiendo a $$\delta(x) = (x-\mu_j)^T \Sigma_j^{-1} (x- \mu_j)$$ 
+    Replazando se tiene
+    $$\delta(x) = (x-\mu_j)^T L_{j}^{-T}L_{j}^{-1} (x- \mu_j)$$ 
+    Como $$(L_{j}^{-1}(x-\mu_j))^{T} = (x-\mu_j)^{T}L_{j}^{-T}$$ 
+    Si definimos $L_{j}^{-1} (x- \mu_j) = z$ entonces 
+    $$\delta(x) = z^{T}z = ||z||^{2} = ||L_{j}^{-1}(x- \mu_j)||^{2}$$
+    Invertir $L_j$ la cual es una matriz triangular, es rapido que invert $\Sigma_j$ completa.
