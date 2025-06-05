@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.linalg as LA
+from scipy.linalg import cholesky, solve_triangular
 from BaseBayesianClassifier import BaseBayesianClassifier
 
 
@@ -103,3 +104,22 @@ class EfficientQDA(TensorizedQDA):
         diag_inner_prod = np.sum(inv_cov_x * unbiased_x, axis=1)  # (k, n)
         
         return 0.5 * np.log(np.linalg.det(self.tensor_inv_cov))[:, np.newaxis] - 0.5 * diag_inner_prod
+
+
+class QDA_Chol1(BaseBayesianClassifier):
+  def _fit_params(self, X, y):
+    self.L_invs = [
+        LA.inv(cholesky(np.cov(X[:,y.flatten()==idx], bias=True), lower=True))
+        for idx in range(len(self.log_a_priori))
+    ]
+
+    self.means = [X[:,y.flatten()==idx].mean(axis=1, keepdims=True)
+                  for idx in range(len(self.log_a_priori))]
+
+  def _predict_log_conditional(self, x, class_idx):
+    L_inv = self.L_invs[class_idx]
+    unbiased_x =  x - self.means[class_idx]
+
+    y = L_inv @ unbiased_x
+
+    return np.log(L_inv.diagonal().prod()) -0.5 * (y**2).sum()

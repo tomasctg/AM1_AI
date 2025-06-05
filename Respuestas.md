@@ -156,3 +156,23 @@ $\ (X - \mu_k)^\top \Sigma_k^{-1} (X - \mu_k)  \in \mathbb{R}^{k \times n \times
     Si definimos $L_{j}^{-1} (x- \mu_j) = z$ entonces 
     $$\delta(x) = z^{T}z = ||z||^{2} = ||L_{j}^{-1}(x- \mu_j)||^{2}$$
     Invertir $L_j$ la cual es una matriz triangular, es rapido que invert $\Sigma_j$ completa.
+
+    Por otro remplanzado la factorizacion en el termino $-\frac{1}{2}\log |\Sigma_j|$ tenemos:
+    $$-\frac{1}{2}\log |\Sigma_j| = -\frac{1}{2}\log |L_{j}L_{j}^{T}|$$ 
+    Donde $$|L_{j}L_{j}^{T}|=|L_{j}||L_{j}^{T}|$$ Como el determinante de la transpuesta de una matriz traingular es igual al determinante de la matriz original entonces
+    $$|L_{j}||L_{j}^{T}| = |L_{j}|^2$$
+    Finalmente como $L_{j}$ es traingular su determinante se calcula como el producto de los elementos en su diagonal. 
+
+9. La diferencia mas notable entre `QDA_Chol1`y `QDA` se encuentra en la etapa de `training`. En `QDA` se calcula la matriz de covarianza para cada clase $\Sigma_j$ mientras que en `QDA_Chol1` aplicando la factorizacion de Cholesky y considerando el resultado del punto 8, se logra un algoritmo en donde se computa la inversa de una matriz traingular inferior, siendo este computo mas rapido. Esto se muestra en el siguiente bloque de codigo.
+```python
+    self.L_invs = [
+        LA.inv(cholesky(np.cov(X[:,y.flatten()==idx], bias=True), lower=True))
+        for idx in range(len(self.log_a_priori))
+    ]
+``` 
+La funcion `cholesky` obtiene en este caso con el flag `lower=True` la matriz inferior resultante de la factorizacion. Luego para cada clase se calcula la inversa. 
+El resultado del punto 8 tambien simplifica la etapa de prediccion usando $\delta(x) = z^{T}z = ||z||^{2} = ||L_{j}^{-1}(x- \mu_j)||^{2}$ entonces el codigo se simplifica como:
+```python
+    y = L_inv @ unbiased_x
+    return np.log(L_inv.diagonal().prod()) -0.5 * (y**2).sum()
+```
