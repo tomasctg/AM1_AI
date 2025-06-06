@@ -1,32 +1,11 @@
 from numpy.random import RandomState
 from Benchmarking import Benchmark
 from Datasets import get_wine_dataset, label_encode, split_transpose
-from QDA import QDA, TensorizedQDA, FasterQDA, EfficientQDA
+from QDA import QDA, TensorizedQDA, FasterQDA, EfficientQDA, QDA_Chol1, QDA_Chol2, QDA_Chol3
 from LDA import LDA
 
 X_full, y_full = get_wine_dataset()
 y_full_encoded = label_encode(y_full)
-
-# X_train, X_test, y_train, y_test = split_transpose(
-#                 X_full, y_full_encoded,0.3,RandomState(42)
-#             )
-
-# qda_model = FasterQDA()
-# qda_model.fit(X_train,y_train)
-# qda_model.predict(X_test)
-
-# qda_model = QDA()
-# qda_model.fit(X_train,y_train)
-# qda_model.predict(X_test)
-
-# lda_model = LDA()
-# lda_model.fit(X_train,y_train)
-# lda_model.predict(X_test)
-
-# lda_model = TensorizedQDA()
-# lda_model.fit(X_train,y_train)
-# lda_model.predict(X_test)
-
 
 b = Benchmark(
     X_full, y_full_encoded,
@@ -37,7 +16,7 @@ b = Benchmark(
     same_splits=False
 )
 
-to_bench = [QDA, TensorizedQDA, LDA, FasterQDA, EfficientQDA]
+to_bench = [QDA, TensorizedQDA, FasterQDA, EfficientQDA, QDA_Chol1, QDA_Chol2, QDA_Chol3]
 
 for model in to_bench:
     b.bench(model)

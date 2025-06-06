@@ -176,3 +176,29 @@ El resultado del punto 8 tambien simplifica la etapa de prediccion usando $\delt
     y = L_inv @ unbiased_x
     return np.log(L_inv.diagonal().prod()) -0.5 * (y**2).sum()
 ```
+
+10. La principal diferencia entre `QDA_Chol1`, `QDA_Chol2` y `QDA_Chol3`, yase en la forma que $y$ se calcula y por lo tanto como se trata a $L_{j}$. En `QDA_Chol1` y `QDA_Chol3` en la etapa de `training` se calcula la inversa de la matrix triangular inferior $L_{j}$ en el primer caso de la forma clasica 
+```python
+LA.inv(cholesky(np.cov(X[:,y.flatten()==idx], bias=True), lower=True))
+```
+y en el segundo caso se hace uso del algoritmo `DTRTRI` el cual computa la inversa de una matriz triangular superior o inferior 
+```python
+dtrtri(cholesky(np.cov(X[:,y.flatten()==idx], bias=True), lower=True), lower=1)[0]
+```
+En el caso de `QDA_Chol2` simplemente se calcula la matrix trinagular inferior $L_{j}$. Lo cual implica diferencia con las otras dos en que al momento de predecir es necesario calcular $y$ y por lo tanto obtener la inversa de $L_{j}$. Pero que que calcular $L_{j}^{-1}(x- \mu_j)$ equivale a resolver el sistema $L_{j}y=(x- \mu_j)$, entonces es posible usar `solve_traingular` un metodo que resulve la equacion ``a x = b`` para `x`, asumiendo que a es una matriz tringular. 
+
+```python
+y = solve_triangular(L, unbiased_x, lower=True)
+```
+11. 
+    | model          | test_median_ms | mean_accuracy | test_speedup | test_mem_reduction |
+    |----------------|----------------|---------------|--------------|--------------------|
+    | QDA            | 5.278476       | 0.982407      | 1.000000     | 1.000000           |
+    | TensorizedQDA  | 1.844894       | 0.982593      | 2.861128     | 0.635025           |
+    | FasterQDA      | 0.119947       | 0.985741      | 44.006553    | 0.069381           |
+    | EfficientQDA   | 0.147977       | 0.983333      | 35.670922    | 0.099187           |
+    | QDA_Chol1      | 2.431347       | 0.986111      | 2.171009     | 0.985795           |
+    | QDA_Chol2      | 5.343377       | 0.982222      | 0.987854     | 1.000627           |
+    | QDA_Chol3      | 2.216614       | 0.984444      | 2.381324     | 1.000627           |
+
+12. Basado en el benchmark anterior se implementara las optimizaciones y tensorizaciones en base al modelo `QDA_Chol3` que presenta la mejor performance de las 3. 
