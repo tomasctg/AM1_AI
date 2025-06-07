@@ -206,16 +206,24 @@ y = solve_triangular(L, unbiased_x, lower=True)
     | QDA_Chol2      | 5.343377       | 0.982222      | 0.987854     | 1.000627           |
     | QDA_Chol3      | 2.216614       | 0.984444      | 2.381324     | 1.000627           |
 
-12. Basado en el benchmark anterior se implementara las optimizaciones y tensorizaciones en base al modelo `QDA_Chol3` que presenta la mejor performance de las 3. 
+    Observando los resultados de la tabla y comparando únicamente los modelos sin tensorización —es decir, `QDA`, `QDA_Chol1`, `QDA_Chol2` y `QDA_Chol3—`, notamos que el uso de la factorización de Cholesky permite un speedup de aproximadamente 2× en el caso de `QDA_Chol1` y `QDA_Chol3`. Esto es esperable, dado que reduce la complejidad computacional al evitar el cálculo directo de la inversa de la matriz de covarianza, utilizando en su lugar una matriz triangular inferior obtenida mediante la descomposición de Cholesky. Esta matriz se calcula una única vez durante la etapa de entrenamiento.
+
+    Sin embargo, en el caso de `QDA_Chol2`, observamos una ligera degradación en el rendimiento con respecto al modelo base (QDA). Esto se debe a que `QDA_Chol2` sólo calcula la matriz triangular inferior de Cholesky durante el entrenamiento, y luego, en cada inferencia, debe resolver el sistema lineal 
+    $Ax=b$ utilizando solve_triangular. Este enfoque resulta más costoso computacionalmente en tiempo de inferencia que calcular una única inversa en la etapa de entrenamiento, al menos en este caso específico. 
+
+    Finalmente, puede observarse que la mejora obtenida solo por factorizar las matrices de covarianza es comparable a la optimización lograda mediante el tensorizado por clases implementado en la clase `TensorizedQDA`.
+
+12. Basado en el benchmark anterior se implementara las optimizaciones y tensorizaciones en base al modelo `QDA_Chol3` que presenta la mejor performance de las 3 
 13. 
-    | Model           | Test Median (ms) | Mean Accuracy | Test Speedup | Memory Reduction |
-    |----------------|------------------|----------------|--------------|------------------|
-    | QDA            | 1.927903         | 0.982407       | 1.000000     | 1.000000         |
-    | TensorizedQDA  | 0.851947         | 0.982593       | 2.262938     | 0.666798         |
-    | FasterQDA      | 0.038151         | 0.985741       | 50.533497    | 0.073220         |
-    | EfficientQDA   | 0.036399         | 0.983333       | 52.966563    | 0.104412         |
-    | QDA_Chol1      | 1.089492         | 0.986111       | 1.769543     | 0.983108         |
-    | QDA_Chol2      | 1.445660         | 0.982222       | 1.333580     | 0.989564         |
-    | QDA_Chol3      | 0.681463         | 0.984444       | 2.829066     | 0.989564         |
-    | TensorizedChol | 0.459781         | 0.986667       | 4.193086     | 0.615087         |
-    | EfficientChol  | 0.019887         | 0.985556       | 96.940467    | 0.104165         |
+    | Model            | Test Median (ms) | Mean Accuracy  | Test Speedup  | Test Mem Reduction  |
+    |------------------|------------------|----------------|---------------|---------------------|
+    | QDA              | 3.481492         | 0.982407       | 1.000000      | 1.000000            |
+    | TensorizedQDA    | 1.511678         | 0.982593       | 2.303065      | 0.627546            |
+    | FasterQDA        | 0.124683         | 0.985741       | 27.922748     | 0.068564            |
+    | EfficientQDA     | 0.087479         | 0.983333       | 39.798031     | 0.098019            |
+    | QDA_Chol1        | 1.917189         | 0.986111       | 1.815935      | 0.974185            |
+    | QDA_Chol2        | 5.746567         | 0.982222       | 0.605839      | 0.988842            |
+    | QDA_Chol3        | 1.950756         | 0.984444       | 1.784689      | 0.988842            |
+    | TensorizedChol   | 1.408362         | 0.986667       | 2.472014      | 0.590344            |
+    | EfficientChol    | 0.075791         | 0.985556       | 45.935429     | 0.097863            |
+
