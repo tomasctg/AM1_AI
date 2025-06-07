@@ -27,7 +27,8 @@ Debido a la forma cuadrática de QDA, no se puede predecir para $n$ observacione
 5. Demostrar que
 $$
 diag(A \cdot B) = \sum_{cols} A \odot B^T = np.sum(A \odot B^T, axis=1)
-$$ es decir, que se puede "esquivar" la matriz de $n \times n$ usando matrices de $n \times p$. También se puede usar, de forma equivalente,
+$$ 
+es decir, que se puede "esquivar" la matriz de $n \times n$ usando matrices de $n \times p$. También se puede usar, de forma equivalente,
 $$
 np.sum(A^T \odot B, axis=0).T
 $$
@@ -147,12 +148,16 @@ $\ (X - \mu_k)^\top \Sigma_k^{-1} (X - \mu_k)  \in \mathbb{R}^{k \times n \times
     $$
     \log{f_j(x)} = -\frac{1}{2}\log |\Sigma_j| - \frac{1}{2} (x-\mu_j)^T \Sigma_j^{-1} (x- \mu_j) + C
     $$
-    Si $$\Sigma_j = L_{j}L_{j}^{T}$$
-    Luego $$\Sigma_j^{-1} = L_{j}^{-T}L_{j}^{-1}$$ 
-    Definiendo a $$\delta(x) = (x-\mu_j)^T \Sigma_j^{-1} (x- \mu_j)$$ 
+    Si 
+    $$\Sigma_j = L_{j}L_{j}^{T}$$
+    Luego 
+    $$\Sigma_j^{-1} = L_{j}^{-T}L_{j}^{-1}$$ 
+    Definiendo a 
+    $$\delta(x) = (x-\mu_j)^T \Sigma_j^{-1} (x- \mu_j)$$ 
     Replazando se tiene
     $$\delta(x) = (x-\mu_j)^T L_{j}^{-T}L_{j}^{-1} (x- \mu_j)$$ 
-    Como $$(L_{j}^{-1}(x-\mu_j))^{T} = (x-\mu_j)^{T}L_{j}^{-T}$$ 
+    Como 
+    $$(L_{j}^{-1}(x-\mu_j))^{T} = (x-\mu_j)^{T}L_{j}^{-T}$$ 
     Si definimos $L_{j}^{-1} (x- \mu_j) = z$ entonces 
     $$\delta(x) = z^{T}z = ||z||^{2} = ||L_{j}^{-1}(x- \mu_j)||^{2}$$
     Invertir $L_j$ la cual es una matriz triangular, es rapido que invert $\Sigma_j$ completa.
@@ -202,3 +207,15 @@ y = solve_triangular(L, unbiased_x, lower=True)
     | QDA_Chol3      | 2.216614       | 0.984444      | 2.381324     | 1.000627           |
 
 12. Basado en el benchmark anterior se implementara las optimizaciones y tensorizaciones en base al modelo `QDA_Chol3` que presenta la mejor performance de las 3. 
+13. 
+    | Model           | Test Median (ms) | Mean Accuracy | Test Speedup | Memory Reduction |
+    |----------------|------------------|----------------|--------------|------------------|
+    | QDA            | 1.927903         | 0.982407       | 1.000000     | 1.000000         |
+    | TensorizedQDA  | 0.851947         | 0.982593       | 2.262938     | 0.666798         |
+    | FasterQDA      | 0.038151         | 0.985741       | 50.533497    | 0.073220         |
+    | EfficientQDA   | 0.036399         | 0.983333       | 52.966563    | 0.104412         |
+    | QDA_Chol1      | 1.089492         | 0.986111       | 1.769543     | 0.983108         |
+    | QDA_Chol2      | 1.445660         | 0.982222       | 1.333580     | 0.989564         |
+    | QDA_Chol3      | 0.681463         | 0.984444       | 2.829066     | 0.989564         |
+    | TensorizedChol | 0.459781         | 0.986667       | 4.193086     | 0.615087         |
+    | EfficientChol  | 0.019887         | 0.985556       | 96.940467    | 0.104165         |
